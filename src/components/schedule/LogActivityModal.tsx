@@ -5,19 +5,32 @@ import { X, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 interface LogActivityModalProps {
+    initialDate?: Date;
     onClose: () => void;
     onSave: (activity: any) => void;
 }
 
-export const LogActivityModal = ({ onClose, onSave }: LogActivityModalProps) => {
+export const LogActivityModal = ({ initialDate, onClose, onSave }: LogActivityModalProps) => {
     const [type, setType] = useState("Run");
+    // Default to initialDate or today, formatted YYYY-MM-DD for input
+    const defaultDate = (initialDate || new Date()).toISOString().split('T')[0];
+    const [dateStr, setDateStr] = useState(defaultDate);
     const [duration, setDuration] = useState("");
+    const [title, setTitle] = useState("");
     const [rpe, setRpe] = useState(5);
     const [notes, setNotes] = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ type, duration, rpe, notes, date: new Date().toISOString() });
+        onSave({
+            title: title || `${type} Session`,
+            type,
+            duration: Number(duration),
+            rpe,
+            description: notes,
+            date: new Date(dateStr).toISOString(),
+            completed: true
+        });
         onClose();
     };
 
@@ -44,6 +57,27 @@ export const LogActivityModal = ({ onClose, onSave }: LogActivityModalProps) => 
                                 </button>
                             ))}
                         </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Activity Title</label>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                            className="input-field"
+                            placeholder="e.g. Morning Jog"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Date</label>
+                        <input
+                            type="date"
+                            value={dateStr}
+                            onChange={e => setDateStr(e.target.value)}
+                            className="input-field"
+                        />
                     </div>
 
                     <div className="form-group">

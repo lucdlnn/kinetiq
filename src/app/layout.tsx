@@ -23,6 +23,8 @@ export const viewport = {
   themeColor: "#0b0b0d", // Matches background
 };
 
+import { PlanProvider } from "@/lib/PlanContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,7 +33,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable}`}>
-        {children}
+        <PlanProvider>
+          {children}
+        </PlanProvider>
       </body>
     </html>
   );

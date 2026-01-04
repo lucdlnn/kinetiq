@@ -93,3 +93,29 @@ a:hover {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Custom Input Styling */
+.input-field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  outline: none;
+  font-family: var(--font-inter);
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: var(--kinetiq-volt);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(204, 255, 0, 0.1);
+}
+
+/* Hide default date picker icon in dark mode and use custom if needed, or just style container */
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.5;
+  cursor: pointer;
+}

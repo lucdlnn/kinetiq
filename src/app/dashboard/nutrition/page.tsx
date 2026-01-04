@@ -7,15 +7,36 @@ import { NutritionDayView } from "@/components/dashboard/NutritionDayView";
 import { Plus, ChevronRight } from "lucide-react";
 
 export default function NutritionPage() {
-  const [date, setDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [chefResult, setChefResult] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const changeDate = (delta: number) => {
-    const newDate = new Date(date);
-    newDate.setDate(newDate.getDate() + delta);
-    setDate(newDate);
+  const generateMeal = async () => {
+    setIsGenerating(true);
+    const cals = (document.getElementById('chef-cals') as HTMLInputElement).value || '500';
+    const focus = (document.getElementById('chef-focus') as HTMLSelectElement).value;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ message: `Suggest a ${focus} meal around ${cals} calories. Format: **Meal Name**\n- Ingredients: [list]\n- Macros: [breakdown]. Keep it concise.` })
+      });
+      const data = await res.json();
+      setChefResult(data.reply);
+    } catch (e) {
+      setChefResult("Error contacting chef.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const macros = [ // ... existing macros code ...
+  const changeDate = (delta: number) => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + delta);
+    setCurrentDate(newDate);
+  };
+
+  const macros = [
     { label: "Protein", value: 120, target: 160, color: "var(--kinetiq-volt)" },
     { label: "Carbs", value: 180, target: 250, color: "#3062FF" },
     { label: "Fats", value: 45, target: 70, color: "#FF9F0A" },
@@ -38,7 +59,7 @@ export default function NutritionPage() {
       </header>
 
       <div className="mb-6">
-        <NutritionDayView date={date} onChangeDate={changeDate} />
+        <NutritionDayView date={currentDate} onChangeDate={changeDate} />
       </div>
 
       <div className="nutrition-grid">
@@ -91,6 +112,38 @@ export default function NutritionPage() {
         </div>
       </div>
 
+      {/* AI Meal Generator */}
+      <div className="glass-panel p-6 mt-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-[50px] rounded-full pointer-events-none" />
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          ✨ AI Chef
+        </h3>
+        <div className="flex gap-4 items-end">
+          <div className="flex-1">
+            <label className="text-xs text-secondary mb-2 block">Target Calories</label>
+            <input type="number" placeholder="e.g. 600" className="input-field" id="chef-cals" />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-secondary mb-2 block">Focus</label>
+            <select className="input-field" id="chef-focus">
+              <option>Balanced</option>
+              <option>High Protein</option>
+              <option>Low Carb</option>
+              <option>Pre-Workout</option>
+            </select>
+          </div>
+          <Button variant="primary" onClick={generateMeal} disabled={isGenerating}>
+            {isGenerating ? "Cooking..." : "Generate"}
+          </Button>
+        </div>
+
+        {chefResult && (
+          <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/10 text-sm leading-relaxed whitespace-pre-wrap">
+            {chefResult}
+          </div>
+        )}
+      </div>
+
       <style jsx>{`
         .mb-8 { margin-bottom: 32px; }
         .mb-6 { margin-bottom: 24px; }
@@ -103,6 +156,8 @@ export default function NutritionPage() {
         .flex-1 { flex: 1; }
         .justify-between { justify-content: space-between; }
         .items-center { align-items: center; }
+        .gap-2 { gap: 8px; }
+        .gap-4 { gap: 16px; }
         
         .text-2xl { font-size: 1.5rem; }
         .font-bold { font-weight: 700; }
@@ -180,6 +235,24 @@ export default function NutritionPage() {
             font-size: 0.9rem;
             font-weight: 600;
         }
+
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .top-0 { top: 0; }
+        .right-0 { right: 0; }
+        .w-32 { width: 128px; }
+        .h-32 { height: 128px; }
+        .bg-purple-500\/10 { background-color: rgba(168, 85, 247, 0.1); }
+        .blur-\[50px\] { filter: blur(50px); }
+        .rounded-full { border-radius: 9999px; }
+        .pointer-events-none { pointer-events: none; }
+        .items-end { align-items: flex-end; }
+        .block { display: block; }
+        .bg-white\/5 { background-color: rgba(255, 255, 255, 0.05); }
+        .rounded-xl { border-radius: 0.75rem; }
+        .border-white\/10 { border-color: rgba(255, 255, 255, 0.1); }
+        .whitespace-pre-wrap { white-space: pre-wrap; }
+        .leading-relaxed { line-height: 1.625; }
 
         @media (max-width: 768px) {
           .nutrition-grid { grid-template-columns: 1fr; }

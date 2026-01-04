@@ -60,6 +60,11 @@ export const Sidebar = () => {
           padding: 24px;
           border-right: 1px solid rgba(255,255,255,0.1);
           border-radius: 0;
+          z-index: 50;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
         }
 
         .logo-area {

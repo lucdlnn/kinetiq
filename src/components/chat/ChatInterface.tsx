@@ -19,6 +19,7 @@ export const ChatInterface = () => {
     }
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -33,6 +34,7 @@ export const ChatInterface = () => {
     const newMsg: Message = { id: Date.now().toString(), role: "user", text: input };
     setMessages(prev => [...prev, newMsg]);
     setInput("");
+    setIsLoading(true);
 
     try {
       const response = await fetch('/api/chat', {
@@ -55,22 +57,70 @@ export const ChatInterface = () => {
         role: "assistant",
         text: "Connection error. Please check your network."
       }]);
+    } finally {
+      setIsLoading(false); // Set loading false after fetch completes or errors
     }
   };
 
+  const renderMessageContent = (text: string) => {
+    // Simple Markdown Parser
+    const lines = text.split('\n');
+    return lines.map((line, idx) => {
+      // Bold: **text**
+      const boldRegex = /\*\*(.*?)\*\*/g;
+      const hasBold = boldRegex.test(line);
+
+      // List items: - item
+      if (line.trim().startsWith('- ')) {
+        const content = line.trim().substring(2);
+        return (
+          <li key={idx} className="ml-4 list-disc mb-1">
+            {hasBold ? <span dangerouslySetInnerHTML={{ __html: content.replace(boldRegex, '<b>$1</b>') }} /> : content}
+          </li>
+        );
+      }
+
+      // Paragraphs with bold support
+      return (
+        <p key={idx} className="mb-2 last:mb-0 min-h-[1.2em]">
+          {hasBold ? <span dangerouslySetInnerHTML={{ __html: line.replace(boldRegex, '<b>$1</b>') }} /> : line}
+        </p>
+      );
+    });
+  };
+
   return (
-    <div className="chat-container glass-panel">
-      <div className="messages-area">
+    <div className="chat-container glass-panel flex flex-col h-[600px]">
+      <div className="chat-header p-4 border-b border-white/10">
+        <h2 className="text-lg font-bold flex items-center gap-2">
+          🤖 Kinetiq Coach <span className="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">Online</span>
+        </h2>
+      </div>
+
+      <div className="messages flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg) => (
-          <div key={msg.id} className={`message-row ${msg.role === 'user' ? 'user-row' : 'bot-row'}`}>
-            <div className={`avatar ${msg.role}`}>
-              {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
-            </div>
-            <div className={`bubble ${msg.role}`}>
-              {msg.text}
+          <div
+            key={msg.id}
+            className={`message flex ${msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
+          >
+            <div
+              className={`max-w-[80%] rounded-2xl p-3 ${msg.role === "user"
+                ? "bg-[#3062ff] text-white rounded-br-none"
+                : "bg-[#1c1c1e] text-gray-200 rounded-bl-none border border-white/10"
+                }`}
+            >
+              {renderMessageContent(msg.text)}
             </div>
           </div>
         ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-[#1c1c1e] p-3 rounded-2xl rounded-bl-none border border-white/10 flex gap-2">
+              <span className="dot-pulse">.</span><span className="dot-pulse delay-100">.</span><span className="dot-pulse delay-200">.</span>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
