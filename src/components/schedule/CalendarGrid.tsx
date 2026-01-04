@@ -69,8 +69,16 @@ export const CalendarGrid = ({ onDayClick, onEventClick }: CalendarGridProps) =>
                                 {dayEvents.map(ev => (
                                     <div
                                         key={ev.id}
-                                        className={`event-chip ${ev.type.toLowerCase()} ${ev.completed ? 'done' : ''}`}
-                                        onClick={(e) => { e.stopPropagation(); onEventClick(ev); }}
+                                        className={`text-xs p-1 mb-1 rounded cursor-pointer truncate
+                                ${ev.type === 'Run' ? 'bg-blue-500/20 text-blue-200' :
+                                                ev.type === 'Strength' ? 'bg-orange-500/20 text-orange-200' :
+                                                    'bg-green-500/20 text-green-200'}
+                                ${ev.completed ? 'line-through opacity-50' : ''}
+                            `}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onEventClick(ev);
+                                        }}
                                     >
                                         {ev.completed && <span className="check">✓</span>}
                                         {ev.type === 'Run' ? '🏃' : ev.type === 'Strength' ? '🏋️' : '⏱️'}

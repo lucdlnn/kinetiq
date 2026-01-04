@@ -12,7 +12,8 @@
 
   /* Text Colors */
   --text-primary: #ffffff;
-  --text-secondary: #8e8e93;
+  --text-secondary: #A0A0A5;
+  /* Lightened from #8F8F95 for better contrast */
   --text-tertiary: #48484a;
 
   /* Spacing & Layout */

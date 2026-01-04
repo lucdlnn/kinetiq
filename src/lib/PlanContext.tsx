@@ -58,8 +58,12 @@ export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [activities, meals, isLoaded]);
 
-    const addActivity = (data: Omit<Activity, 'id'>) => {
-        const newActivity = { ...data, id: Date.now().toString() };
+    const addActivity = (activity: Omit<Activity, 'id' | 'completed'>) => {
+        const newActivity: Activity = {
+            ...activity,
+            id: Math.random().toString(36).substr(2, 9),
+            completed: false, // Default to false
+        };
         setActivities(prev => [...prev, newActivity]);
     };
 

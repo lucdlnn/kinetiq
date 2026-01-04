@@ -70,46 +70,59 @@ export const ChatInterface = () => {
       const boldRegex = /\*\*(.*?)\*\*/g;
       const hasBold = boldRegex.test(line);
 
-      // List items: - item
+      // Links: [text](url)
+      const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g;
+      const hasLink = linkRegex.test(line);
+
+      // Headings
+      if (line.startsWith('# ')) return <h3 key={idx} className="text-lg font-bold mt-4 mb-2 text-white border-b border-white/10 pb-1">{line.substring(2)}</h3>;
+      if (line.startsWith('## ')) return <h3 key={idx} className="text-base font-bold mt-4 mb-2 text-kinetiq-volt">{line.substring(3)}</h3>;
+      if (line.startsWith('### ')) return <h3 key={idx} className="text-sm font-bold mt-3 mb-1 text-white">{line.substring(4)}</h3>;
+
+      // List items
       if (line.trim().startsWith('- ')) {
         const content = line.trim().substring(2);
+        let processedContent = content;
+        if (hasBold) processedContent = processedContent.replace(boldRegex, '<strong class="text-white font-semibold">$1</strong>');
+        if (hasLink) processedContent = processedContent.replace(linkRegex, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">$1</a>');
         return (
-          <li key={idx} className="ml-4 list-disc mb-1">
-            {hasBold ? <span dangerouslySetInnerHTML={{ __html: content.replace(boldRegex, '<b>$1</b>') }} /> : content}
+          <li key={idx} className="ml-4 list-disc mb-1 text-gray-300">
+            <span dangerouslySetInnerHTML={{ __html: processedContent }} />
           </li>
         );
       }
 
-      // Paragraphs with bold support
+      // Paragraphs
+      let processedLine = line;
+      if (hasBold) processedLine = processedLine.replace(boldRegex, '<strong class="text-white font-semibold">$1</strong>');
+      if (hasLink) processedLine = processedLine.replace(linkRegex, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">$1</a>');
+
       return (
-        <p key={idx} className="mb-2 last:mb-0 min-h-[1.2em]">
-          {hasBold ? <span dangerouslySetInnerHTML={{ __html: line.replace(boldRegex, '<b>$1</b>') }} /> : line}
+        <p key={idx} className="mb-3 last:mb-0 leading-relaxed text-gray-300">
+          <span dangerouslySetInnerHTML={{ __html: processedLine }} />
         </p>
       );
     });
   };
 
   return (
-    <div className="chat-container glass-panel flex flex-col h-[600px]">
+    <div className="chat-interface flex flex-col h-[600px] glass-panel relative overflow-hidden">
+      {/* Background Decoration */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
+
       <div className="chat-header p-4 border-b border-white/10">
         <h2 className="text-lg font-bold flex items-center gap-2">
           🤖 Kinetiq Coach <span className="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">Online</span>
         </h2>
       </div>
 
-      <div className="messages flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="chat-messages flex-1 overflow-y-auto p-6 scrollbar-thin">
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`message flex ${msg.role === "user" ? "justify-end" : "justify-start"
-              }`}
-          >
-            <div
-              className={`max-w-[80%] rounded-2xl p-3 ${msg.role === "user"
-                ? "bg-[#3062ff] text-white rounded-br-none"
-                : "bg-[#1c1c1e] text-gray-200 rounded-bl-none border border-white/10"
-                }`}
-            >
+          <div key={msg.id} className={`message mb-6 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`message-bubble max-w-[85%] rounded-2xl p-4 ${msg.role === 'user'
+                ? 'bg-blue-600/20 border border-blue-500/30 text-white rounded-tr-none'
+                : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-none shadow-lg backdrop-blur-sm'
+              }`}>
               {renderMessageContent(msg.text)}
             </div>
           </div>
