@@ -1,0 +1,80 @@
+.kinetiq-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-inter);
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border-radius: 9999px;
+    /* Pills look premium */
+}
+
+.kinetiq-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Variants */
+.kinetiq-btn--primary {
+    background: var(--kinetiq-volt);
+    color: var(--kinetiq-black);
+}
+
+.kinetiq-btn--primary:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(204, 255, 0, 0.3);
+}
+
+.kinetiq-btn--secondary {
+    background: var(--kinetiq-electric);
+    color: #ffffff;
+}
+
+.kinetiq-btn--secondary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(48, 98, 255, 0.3);
+}
+
+.kinetiq-btn--outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-primary);
+}
+
+.kinetiq-btn--outline:hover {
+    border-color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.kinetiq-btn--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+.kinetiq-btn--ghost:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Sizes */
+.kinetiq-btn--sm {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+}
+
+.kinetiq-btn--md {
+    padding: 12px 24px;
+    font-size: 1rem;
+}
+
+.kinetiq-btn--lg {
+    padding: 16px 32px;
+    font-size: 1.125rem;
+}
+
+.kinetiq-btn--full {
+    width: 100%;
+}
