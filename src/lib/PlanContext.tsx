@@ -37,7 +37,7 @@ interface PlanContextType {
     meals: Meal[];
     macroTargets: MacroTargets;
     setMacroTargets: (targets: MacroTargets) => void;
-    addActivity: (activity: Omit<Activity, 'id' | 'completed'>) => void;
+    addActivity: (activity: Omit<Activity, 'id' | 'completed'> & { completed?: boolean }) => void;
     addMeal: (meal: Omit<Meal, 'id'>) => void;
     toggleActivityCompletion: (id: string) => void;
     deleteActivity: (id: string) => void;
@@ -74,11 +74,11 @@ export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [activities, meals, macroTargets, isLoaded]);
 
-    const addActivity = (activity: Omit<Activity, 'id' | 'completed'>) => {
+    const addActivity = (activity: Omit<Activity, 'id' | 'completed'> & { completed?: boolean }) => {
         const newActivity: Activity = {
             ...activity,
             id: Math.random().toString(36).substr(2, 9),
-            completed: false, // Default to false
+            completed: activity.completed ?? false, // Default to false if not provided
         };
         setActivities(prev => [...prev, newActivity]);
     };
