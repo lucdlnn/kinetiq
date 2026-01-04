@@ -1,62 +1,75 @@
 "use client";
 
-import { IntegrationCard } from "@/components/dashboard/IntegrationCard";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/Button";
+import { useSearchParams } from "next/navigation";
 
 export default function SettingsPage() {
-    return (
-        <div className="settings-page">
-            <header className="mb-8">
-                <h1 className="text-2xl font-bold">Settings & Integrations</h1>
-                <p className="text-secondary">Manage data sources and devices.</p>
-            </header>
+    const searchParams = useSearchParams();
+    const [isStravaConnected, setIsStravaConnected] = useState(false);
 
-            <div className="integrations-grid">
-                <h3 className="section-title mb-4">Connected Apps</h3>
-                <div className="card-stack">
-                    <IntegrationCard
-                        name="Garmin Connect"
-                        icon="⌚"
-                        description="Sync activities, heart rate, and sleep data."
-                    />
-                    <IntegrationCard
-                        name="Strava"
-                        icon="🟠"
-                        description="Import routes and share activities."
-                        connected={true}
-                    />
-                    <IntegrationCard
-                        name="MyFitnessPal"
-                        icon="🥑"
-                        description="Sync nutrition logs and caloric intake."
-                    />
-                    <IntegrationCard
-                        name="Apple Health"
-                        icon="❤️"
-                        description="Sync daily steps and biological data."
-                    />
+    useEffect(() => {
+        if (searchParams.get('strava_connected')) {
+            setIsStravaConnected(true);
+            localStorage.setItem('kinetiq_strava_status', 'connected');
+        } else {
+            const status = localStorage.getItem('kinetiq_strava_status');
+            if (status === 'connected') setIsStravaConnected(true);
+        }
+    }, [searchParams]);
+
+    const handleConnectStrava = () => {
+        // Redirect to our API handler
+        window.location.href = '/api/strava';
+    };
+
+    return (
+        <div className="p-8">
+            <h1 className="text-2xl font-bold mb-8">Settings & Integrations</h1>
+
+            <div className="glass-panel p-6 max-w-2xl">
+                <h3 className="text-lg font-bold mb-4">Connected Apps</h3>
+
+                <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-[#FC4C02] rounded-lg flex items-center justify-center font-bold text-white">
+                            S
+                        </div>
+                        <div>
+                            <h4 className="font-bold">Strava</h4>
+                            <p className="text-sm text-secondary">Sync runs and cycles</p>
+                        </div>
+                    </div>
+                    {isStravaConnected ? (
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                            <span className="text-sm text-green-500 font-medium">Connected</span>
+                        </div>
+                    ) : (
+                        <Button variant="outline" onClick={handleConnectStrava}>Connect</Button>
+                    )}
+                </div>
+
+                <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/10 opacity-50 pointer-events-none">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-[#000000] rounded-lg flex items-center justify-center font-bold text-white">
+                                G
+                            </div>
+                            <div>
+                                <h4 className="font-bold">Garmin Connect</h4>
+                                <p className="text-sm text-secondary">Coming soon</p>
+                            </div>
+                        </div>
+                        <Button variant="outline">Connect</Button>
+                    </div>
                 </div>
             </div>
 
-            <style jsx>{`
-         .settings-page { max-width: 800px; }
-         .mb-8 { margin-bottom: 32px; }
-         .mb-4 { margin-bottom: 16px; }
-         .text-2xl { font-size: 1.5rem; }
-         .font-bold { font-weight: 700; }
-         .text-secondary { color: var(--text-secondary); }
-         
-         .section-title {
-           font-size: 1.1rem;
-           font-weight: 600;
-           color: white;
-         }
-
-         .card-stack {
-           display: flex;
-           flex-direction: column;
-           gap: 16px;
-         }
-       `}</style>
+            <div className="mt-8">
+                <h3 className="text-lg font-bold mb-4">Debugging</h3>
+                <p className="text-sm text-secondary mb-2">If you want to test the Strava flow without API keys, it will fail on the server. Please add <code>STRAVA_CLIENT_ID</code> to your Vercel Environment Variables.</p>
+            </div>
         </div>
     );
 }

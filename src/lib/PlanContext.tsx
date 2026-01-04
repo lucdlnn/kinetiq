@@ -22,12 +22,22 @@ export interface Meal {
     title: string;
     calories: number;
     macros: { p: number; c: number; f: number };
+    isPlanned: boolean; // True = AI/Coach suggestion, False = Actually eaten
+}
+
+export interface MacroTargets {
+    calories: number;
+    p: number;
+    c: number;
+    f: number;
 }
 
 interface PlanContextType {
     activities: Activity[];
     meals: Meal[];
-    addActivity: (activity: Omit<Activity, 'id'>) => void;
+    macroTargets: MacroTargets;
+    setMacroTargets: (targets: MacroTargets) => void;
+    addActivity: (activity: Omit<Activity, 'id' | 'completed'>) => void;
     addMeal: (meal: Omit<Meal, 'id'>) => void;
     toggleActivityCompletion: (id: string) => void;
     deleteActivity: (id: string) => void;
@@ -39,14 +49,19 @@ const PlanContext = createContext<PlanContextType | undefined>(undefined);
 export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
     const [activities, setActivities] = useState<Activity[]>([]);
     const [meals, setMeals] = useState<Meal[]>([]);
+    const [macroTargets, setMacroTargetsState] = useState<MacroTargets>({ calories: 2400, p: 160, c: 250, f: 70 });
     const [isLoaded, setIsLoaded] = useState(false);
 
     // Load from LocalStorage
     useEffect(() => {
         const savedActivities = localStorage.getItem('kinetiq_activities');
         const savedMeals = localStorage.getItem('kinetiq_meals');
+        const savedTargets = localStorage.getItem('kinetiq_targets');
+
         if (savedActivities) setActivities(JSON.parse(savedActivities));
         if (savedMeals) setMeals(JSON.parse(savedMeals));
+        if (savedTargets) setMacroTargetsState(JSON.parse(savedTargets));
+
         setIsLoaded(true);
     }, []);
 
@@ -55,8 +70,9 @@ export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
         if (isLoaded) {
             localStorage.setItem('kinetiq_activities', JSON.stringify(activities));
             localStorage.setItem('kinetiq_meals', JSON.stringify(meals));
+            localStorage.setItem('kinetiq_targets', JSON.stringify(macroTargets));
         }
-    }, [activities, meals, isLoaded]);
+    }, [activities, meals, macroTargets, isLoaded]);
 
     const addActivity = (activity: Omit<Activity, 'id' | 'completed'>) => {
         const newActivity: Activity = {
@@ -70,6 +86,10 @@ export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
     const addMeal = (data: Omit<Meal, 'id'>) => {
         const newMeal = { ...data, id: Date.now().toString() };
         setMeals(prev => [...prev, newMeal]);
+    };
+
+    const setMacroTargets = (targets: MacroTargets) => {
+        setMacroTargetsState(targets);
     };
 
     const toggleActivityCompletion = (id: string) => {
@@ -87,7 +107,7 @@ export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <PlanContext.Provider value={{
-            activities, meals, addActivity, addMeal, toggleActivityCompletion, deleteActivity, getActivitiesByDate
+            activities, meals, macroTargets, setMacroTargets, addActivity, addMeal, toggleActivityCompletion, deleteActivity, getActivitiesByDate
         }}>
             {children}
         </PlanContext.Provider>
