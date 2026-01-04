@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/Button";
 import { useSearchParams } from "next/navigation";
 
-export default function SettingsPage() {
+function SettingsContent() {
     const searchParams = useSearchParams();
     const [isStravaConnected, setIsStravaConnected] = useState(false);
 
@@ -71,5 +71,13 @@ export default function SettingsPage() {
                 <p className="text-sm text-secondary mb-2">If you want to test the Strava flow without API keys, it will fail on the server. Please add <code>STRAVA_CLIENT_ID</code> to your Vercel Environment Variables.</p>
             </div>
         </div>
+    );
+}
+
+export default function SettingsPage() {
+    return (
+        <Suspense fallback={<div className="p-8">Loading settings...</div>}>
+            <SettingsContent />
+        </Suspense>
     );
 }
