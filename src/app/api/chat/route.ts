@@ -17,5 +17,5 @@ export async function POST(req: Request) {
     - For workouts: Structure with Warm-up, Main Set, Cool-down.`,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
 }
