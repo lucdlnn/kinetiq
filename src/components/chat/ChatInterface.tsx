@@ -1,20 +1,24 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User, Bot } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { useState, useRef, useEffect } from "react";
+import { Send, User, Bot, Paperclip, Smile } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 interface Message {
   id?: string;
-  role: 'user' | 'assistant';
-  content: string; // Unified: use content, not text
+  role: "user" | "assistant";
+  content: string;
 }
 
 export const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hello! I'm your Kinetiq Coach. 🤖\n\nI can help you with:\n- **Workout Plans** tailored to your goals.\n- **Meal Suggestions** with macros (try asking for a recipe!).\n- **Form Tips** & advice.\n\nHow are you feeling today?" }
+    {
+      id: "init",
+      role: "assistant",
+      content: "Hello! I'm your Kinetiq Coach. 🤖\n\nI can help you with:\n- **Workout Plans** tailored to your goals.\n- **Meal Suggestions** with macros.\n\nHow can I help you today?"
+    }
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -29,148 +33,138 @@ export const ChatInterface = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMsg = { role: 'user' as const, content: input };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
+    const userMsg: Message = { id: Date.now().toString(), role: "user", content: input };
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input })
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input }),
       });
 
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      setMessages((prev) => [
+        ...prev,
+        { id: (Date.now() + 1).toString(), role: "assistant", content: data.reply },
+      ]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "⚠️ Connection error. Please try again." }]);
+      setMessages((prev) => [
+        ...prev,
+        { id: (Date.now() + 1).toString(), role: "assistant", content: "⚠️ Connection error. Please try again." },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Helper to render Markdown-like content safely
-  const renderContent = (text: string) => {
-    // Simple parser for basic formatting to avoid heavy libraries for now
-    // 1. Headers
-    let processed = text.replace(/### (.*$)/gim, '<h3 class="font-bold text-lg mt-3 mb-1 text-white">$1</h3>');
-    processed = processed.replace(/## (.*$)/gim, '<h2 class="font-bold text-xl mt-4 mb-2 text-kinetiq-volt">$1</h2>');
-
-    // 2. Bold
-    processed = processed.replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white font-semibold">$1</strong>');
-
-    // 3. Lists ( - item)
-    processed = processed.replace(/^- (.*$)/gim, '<li class="ml-4 list-disc marker:text-kinetiq-volt text-secondary">$1</li>');
-
-    // 4. Links [Title](url) -> Button
-    processed = processed.replace(
-      /\[(.*?)\]\((.*?)\)/gim,
-      '<a href="$2" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-kinetiq-volt mt-1 transition-colors">🔗 $1</a>'
-    );
-
-    // 5. Wrap in paragraphs (simple split by newline)
-    return processed.split('\n').map((line, i) => {
-      if (line.match(/^<h/)) return <div key={i} dangerouslySetInnerHTML={{ __html: line }} />;
-      if (line.match(/^<li/)) return <ul key={i} dangerouslySetInnerHTML={{ __html: line }} className="my-1" />;
-      if (line.trim() === '') return <div key={i} className="h-2" />;
-      return <p key={i} dangerouslySetInnerHTML={{ __html: line }} className="leading-relaxed text-secondary/90 mb-1" />;
-    });
-  };
-
   return (
-    <div className="flex flex-col h-[600px] w-full max-w-4xl mx-auto bg-[#0a0a0a] rounded-2xl border border-white/5 shadow-2xl overflow-hidden relative glass-panel">
-      {/* Ambient Background */}
-      <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_var(--kinetiq-volt)_0%,_transparent_5%)] opacity-5 pointer-events-none" />
+    <div className="flex flex-col h-full w-full max-w-4xl mx-auto bg-[#1e1e1e] rounded-3xl shadow-2xl overflow-hidden border border-[#2e2e2e]">
 
-      {/* Header */}
-      <div className="p-4 border-b border-white/5 bg-white/5 backdrop-blur-md flex items-center justify-between z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-kinetiq-volt to-emerald-500 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(204,255,0,0.3)]">
-            <Sparkles size={20} className="text-black" />
+      {/* HEADER - Messenger Style */}
+      <div className="bg-[#252525] p-4 flex items-center justify-between border-b border-[#333]">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg">
+              <Bot size={24} className="text-white" />
+            </div>
+            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[#252525]"></div>
           </div>
           <div>
-            <h3 className="font-bold text-white">Coach Kinetiq</h3>
-            <p className="text-xs text-green-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" /> Online
-            </p>
+            <h2 className="text-white font-bold text-lg">Kinetiq Coach</h2>
+            <p className="text-gray-400 text-xs font-medium">Active now</p>
           </div>
         </div>
+        <Button variant="ghost" className="!p-2 text-gray-400 hover:text-white">
+          <span className="text-2xl">⋮</span>
+        </Button>
       </div>
 
-      {/* MESSAGES: Colorful Bubbles */}
-      <div className="chat-messages flex-1 overflow-y-auto p-5 scrollbar-thin space-y-4">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-enter`}>
-            <div className={`
-                max-w-[85%] rounded-[20px] px-5 py-3 shadow-md text-[15px] leading-relaxed
-                ${msg.role === 'user'
-                ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-sm'
-                : 'bg-[#27272A] text-gray-100 rounded-tl-sm border border-[#3F3F46]'}
-             `}>
-              {/* Explicitly render distinct blocks */}
-              {msg.content.split('\n').map((line, i) => {
-                if (!line.trim()) return <div key={i} className="h-2" />;
+      {/* MESSAGES AREA */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#121212]">
+        {messages.map((msg, idx) => (
+          <div
+            key={idx}
+            className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+          >
+            {/* Avatar for Assistant */}
+            {msg.role === "assistant" && (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex flex-shrink-0 items-center justify-center mr-3 mt-auto shadow-md">
+                <Bot size={14} className="text-white" />
+              </div>
+            )}
 
-                // Headings
-                if (line.startsWith('##')) return <h3 key={i} className="text-lg font-bold text-kinetiq-volt mt-2 mb-1">{line.replace(/#/g, '')}</h3>;
-                if (line.startsWith('**')) return <p key={i} className="font-bold mb-1" dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '$1') }} />;
+            <div
+              className={`max-w-[75%] px-5 py-3 text-[15px] leading-relaxed shadow-sm relative
+                ${msg.role === "user"
+                  ? "bg-[#3062FF] text-white rounded-[20px] rounded-br-[4px]"
+                  : "bg-[#252525] text-gray-100 rounded-[20px] rounded-bl-[4px]"
+                }
+              `}
+            >
+              {/* Content Parsing */}
+              {msg.content.split("\n").map((line, i) => {
+                if (!line.trim()) return <div key={i} className="h-3" />;
 
-                // Lists
-                if (line.trim().startsWith('- ')) return (
-                  <div key={i} className="flex gap-2 mb-1 ml-1">
-                    <span className="text-kinetiq-volt">•</span>
-                    <span dangerouslySetInnerHTML={{
-                      __html: line.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-400 underline">$1</a>')
-                    }} />
-                  </div>
-                );
+                // Simple formatting
+                const formattedLine = line
+                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                  .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="underline font-bold decoration-white/50">$1</a>');
 
-                // Standard Paragraph with link support
-                return <p key={i} className="mb-2 last:mb-0" dangerouslySetInnerHTML={{
-                  __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="underline decoration-kinetiq-volt decoration-2 font-medium hover:text-kinetiq-volt transition-colors">$1</a>')
-                }} />;
+                if (line.startsWith("##")) return <h3 key={i} dangerouslySetInnerHTML={{ __html: formattedLine.replace(/#/g, '') }} className="text-lg font-bold mb-2 mt-2" />;
+                if (line.trim().startsWith("- ")) return <div key={i} className="pl-2 mb-1 flex"><span className="mr-2">•</span><span dangerouslySetInnerHTML={{ __html: formattedLine.substring(2) }} /></div>;
+
+                return <p key={i} dangerouslySetInnerHTML={{ __html: formattedLine }} className="mb-1" />;
               })}
             </div>
           </div>
         ))}
 
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-[#27272A] px-4 py-3 rounded-[20px] rounded-tl-sm border border-[#3F3F46] flex gap-1.5 items-center">
-              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
-              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100" />
-              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200" />
+          <div className="flex justify-start w-full">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex flex-shrink-0 items-center justify-center mr-3 mt-auto shadow-md">
+              <Bot size={14} className="text-white" />
+            </div>
+            <div className="bg-[#252525] px-4 py-3 rounded-[20px] rounded-bl-[4px] flex items-center gap-1.5">
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 bg-black/40 backdrop-blur-md border-t border-white/5">
-        <div className="flex gap-2 relative">
+      {/* INPUT AREA - Pill Shape at bottom */}
+      <div className="bg-[#1e1e1e] p-4 border-t border-[#2e2e2e]">
+        <div className="flex items-center gap-3 bg-[#2a2a2a] rounded-full px-4 py-2 border border-[#3a3a3a] transition-colors focus-within:border-[#3062FF]">
+          <button className="text-gray-400 hover:text-white transition-colors">
+            <Paperclip size={20} />
+          </button>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-            placeholder="Ask for a workout, meal plan, or advice..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-kinetiq-volt/50 focus:bg-white/10 transition-all placeholder:text-secondary/50"
+            onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+            placeholder="Message Coach Kinetiq..."
+            className="flex-1 bg-transparent border-none outline-none text-white text-sm placeholder-gray-500 h-10"
           />
+          <button className="text-gray-400 hover:text-white transition-colors">
+            <Smile size={20} />
+          </button>
           <Button
             onClick={sendMessage}
-            variant="primary"
-            disabled={isLoading || !input.trim()}
-            className="h-[46px] w-[46px] !p-0 flex items-center justify-center rounded-xl flex-shrink-0"
+            disabled={!input.trim()}
+            className={`!w-8 !h-8 !p-0 !rounded-full flex items-center justify-center transition-all ${input.trim() ? "bg-[#3062FF] hover:bg-blue-600 scale-100" : "bg-gray-600 scale-90 opacity-50"
+              }`}
           >
-            <Send size={18} />
+            <Send size={14} className="text-white ml-0.5" />
           </Button>
         </div>
-        <p className="text-[10px] text-center text-secondary/30 mt-2">
-          AI can make mistakes. Check important info.
+        <p className="text-[10px] text-center text-gray-600 mt-2 font-medium">
+          AI-generated advice. Consult a professional for medical needs.
         </p>
       </div>
     </div>
