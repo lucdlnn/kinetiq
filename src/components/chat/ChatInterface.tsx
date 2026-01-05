@@ -1,87 +1,130 @@
 "use client";
 
 import { useChat } from '@ai-sdk/react';
-import { Bot, User, Send, StopCircle } from "lucide-react";
+import { Bot, Send, StopCircle, Paperclip, Smile } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 export const ChatInterface = () => {
   const { messages, input, handleInputChange, handleSubmit, isLoading, stop } = useChat() as any;
 
   return (
-    <div className="flex flex-col h-full bg-black text-white font-sans antialiased">
+    <div className="flex flex-col h-full w-full max-w-4xl mx-auto bg-[#1e1e1e] rounded-3xl shadow-2xl overflow-hidden border border-[#2e2e2e]">
 
-      {/* Scrollable Chat Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin">
-        <div className="max-w-3xl mx-auto space-y-8">
-          {messages.map((m: any) => (
-            <div key={m.id} className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-
-              {/* Avatar Column */}
-              <div className="flex-shrink-0 mt-1">
-                {m.role === 'user' ? (
-                  <div className="w-8 h-8 rounded-full bg-[#333] flex items-center justify-center border border-[#444]">
-                    <User size={16} className="text-gray-200" />
-                  </div>
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                    <Bot size={16} className="text-white" />
-                  </div>
-                )}
-              </div>
-
-              {/* Content Column */}
-              <div className="flex-1 space-y-2">
-                <p className="font-semibold text-sm text-gray-400">
-                  {m.role === 'user' ? 'You' : 'Kinetiq'}
-                </p>
-                <div className="prose prose-invert max-w-none text-[15px] leading-7 text-gray-200">
-                  {m.content.split('\n').map((line: any, i: any) => (
-                    <p key={i} className="mb-2 last:mb-0">
-                      {line.replace(/\*\*/g, '')}
-                      {/* Simple text render first to match clean style, can add Markdown component later if needed */}
-                    </p>
-                  ))}
-                </div>
-              </div>
-
+      {/* HEADER - Messenger Style */}
+      <div className="bg-[#252525] p-4 flex items-center justify-between border-b border-[#333]">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg">
+              <Bot size={24} className="text-white" />
             </div>
-          ))}
-          {isLoading && (
-            <div className="flex gap-4 max-w-3xl mx-auto pl-[48px]">
-              <span className="w-2 h-2 bg-gray-600 rounded-full animate-pulse" />
-              <span className="w-2 h-2 bg-gray-600 rounded-full animate-pulse delay-75" />
-              <span className="w-2 h-2 bg-gray-600 rounded-full animate-pulse delay-150" />
-            </div>
-          )}
+            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[#252525]"></div>
+          </div>
+          <div>
+            <h2 className="text-white font-bold text-lg">Kinetiq Coach</h2>
+            <p className="text-gray-400 text-xs font-medium">Active now • Vercel AI SDK</p>
+          </div>
         </div>
+        <Button variant="ghost" className="!p-2 text-gray-400 hover:text-white">
+          <span className="text-2xl">⋮</span>
+        </Button>
       </div>
 
-      {/* Input Area - Fixed Bottom */}
-      <div className="p-4 bg-black/80 backdrop-blur-lg border-t border-[#333] z-20">
-        <div className="max-w-3xl mx-auto relative">
-          <form onSubmit={handleSubmit} className="relative">
-            <input
-              className="w-full bg-[#1A1A1A] border border-[#333] rounded-xl pl-4 pr-12 py-3.5 text-sm text-white focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all placeholder:text-gray-500"
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Ask anything..."
-            />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2">
-              {isLoading ? (
-                <button type="button" onClick={() => stop()} className="p-2 text-gray-400 hover:text-white transition-colors">
-                  <StopCircle size={18} />
-                </button>
-              ) : (
-                <button type="submit" disabled={!input} className="p-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50">
-                  <Send size={18} />
-                </button>
-              )}
+      {/* MESSAGES AREA */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#121212] scrollbar-thin">
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500 opacity-50">
+            <Bot size={48} className="mb-4" />
+            <p>Start a conversation...</p>
+          </div>
+        )}
+
+        {messages.map((msg: any, idx: number) => (
+          <div
+            key={msg.id || idx}
+            className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+          >
+            {/* Avatar for Assistant */}
+            {msg.role !== "user" && (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex flex-shrink-0 items-center justify-center mr-3 mt-auto shadow-md">
+                <Bot size={14} className="text-white" />
+              </div>
+            )}
+
+            <div
+              className={`max-w-[75%] px-5 py-3 text-[15px] leading-relaxed shadow-sm relative break-words
+                ${msg.role === "user"
+                  ? "bg-[#3062FF] text-white rounded-[20px] rounded-br-[4px]"
+                  : "bg-[#252525] text-gray-100 rounded-[20px] rounded-bl-[4px]"
+                }
+              `}
+            >
+              {/* Content Parsing */}
+              {msg.content.split("\n").map((line: any, i: any) => {
+                if (!line.trim()) return <div key={i} className="h-3" />;
+
+                // Simple formatting
+                const formattedLine = line
+                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                  .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="underline font-bold decoration-white/50">$1</a>');
+
+                if (line.startsWith("##")) return <h3 key={i} dangerouslySetInnerHTML={{ __html: formattedLine.replace(/#/g, '') }} className="text-lg font-bold mb-2 mt-2" />;
+                if (line.trim().startsWith("- ")) return <div key={i} className="pl-2 mb-1 flex"><span className="mr-2">•</span><span dangerouslySetInnerHTML={{ __html: formattedLine.substring(2) }} /></div>;
+
+                return <p key={i} dangerouslySetInnerHTML={{ __html: formattedLine }} className="mb-1" />;
+              })}
             </div>
-          </form>
-          <p className="text-center text-[10px] text-gray-600 mt-3 font-mono">
-            Kinetiq AI can make mistakes.
-          </p>
-        </div>
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="flex justify-start w-full">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex flex-shrink-0 items-center justify-center mr-3 mt-auto shadow-md">
+              <Bot size={14} className="text-white" />
+            </div>
+            <div className="bg-[#252525] px-4 py-3 rounded-[20px] rounded-bl-[4px] flex items-center gap-1.5">
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* INPUT AREA - Pill Shape at bottom */}
+      <div className="bg-[#1e1e1e] p-4 border-t border-[#2e2e2e]">
+        <form onSubmit={handleSubmit} className="flex items-center gap-3 bg-[#2a2a2a] rounded-full px-4 py-2 border border-[#3a3a3a] transition-colors focus-within:border-[#3062FF]">
+          <button type="button" className="text-gray-400 hover:text-white transition-colors">
+            <Paperclip size={20} />
+          </button>
+          <input
+            type="text"
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Message Coach Kinetiq..."
+            className="flex-1 bg-transparent border-none outline-none text-white text-sm placeholder-gray-500 h-10"
+          />
+          <button type="button" className="text-gray-400 hover:text-white transition-colors">
+            <Smile size={20} />
+          </button>
+
+          {isLoading ? (
+            <button type="button" onClick={() => stop()} className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center hover:bg-red-500 transition-all">
+              <StopCircle size={14} className="text-white" />
+            </button>
+          ) : (
+            <Button
+              type="submit"
+              disabled={!input.trim()}
+              className={`!w-8 !h-8 !p-0 !rounded-full flex items-center justify-center transition-all ${input.trim() ? "bg-[#3062FF] hover:bg-blue-600 scale-100" : "bg-gray-600 scale-90 opacity-50"
+                }`}
+            >
+              <Send size={14} className="text-white ml-0.5" />
+            </Button>
+          )}
+        </form>
+        <p className="text-[10px] text-center text-gray-600 mt-2 font-medium">
+          AI-generated advice. Consult a professional for medical needs.
+        </p>
       </div>
     </div>
   );
