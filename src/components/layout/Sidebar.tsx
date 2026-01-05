@@ -50,17 +50,18 @@ export const Sidebar = () => {
 
       <style jsx>{`
         .sidebar {
-          width: 260px;
+          width: 280px;
           height: 100vh;
           position: fixed;
           left: 0;
           top: 0;
           display: flex;
           flex-direction: column;
-          padding: 24px;
-          border-right: 1px solid rgba(255,255,255,0.1);
-          border-radius: 0;
+          padding: 32px 24px;
+          background: rgba(18, 18, 20, 0.95); /* Deep dark background */
+          border-right: 1px solid rgba(255,255,255,0.08);
           z-index: 50;
+          backdrop-filter: blur(20px);
         }
 
         @media (max-width: 768px) {
@@ -68,14 +69,17 @@ export const Sidebar = () => {
         }
 
         .logo-area {
-          margin-bottom: 40px;
+          margin-bottom: 48px;
           padding-left: 12px;
         }
 
         .logo-text {
-          font-size: 1.5rem;
+          font-size: 1.75rem;
           font-weight: 800;
-          letter-spacing: -0.05em;
+          letter-spacing: -0.03em;
+          background: linear-gradient(to right, #ffffff, #a1a1aa); /* Chrome/Silver gradient */
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
         }
 
         .nav-menu {
@@ -88,40 +92,45 @@ export const Sidebar = () => {
         .nav-item {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 12px;
-          border-radius: var(--radius-md);
-          color: var(--text-secondary);
-          position: relative;
-          transition: 0.2s;
+          gap: 16px;
+          padding: 14px 16px;
+          border-radius: 16px;
+          color: #A1A1AA; /* Light gray for inactive */
+          font-size: 0.95rem;
+          font-weight: 600;
+          transition: all 0.2s ease-out;
+          text-decoration: none;
+          border: 1px solid transparent;
         }
 
         .nav-item:hover {
-          color: white;
-          background: rgba(255,255,255,0.05);
+          color: #ffffff;
+          background: rgba(255,255,255,0.08); /* Subtle highlight */
+          transform: translateX(4px);
         }
 
         .nav-item.active {
-          color: var(--kinetiq-volt);
-          background: rgba(204, 255, 0, 0.1);
+          color: #121214; /* Black text on Volt */
+          background: var(--kinetiq-volt);
+          box-shadow: 0 4px 20px rgba(204, 255, 0, 0.2); /* Glow */
+          border-color: var(--kinetiq-volt);
         }
 
-        .nav-label {
-          font-weight: 500;
-          font-size: 0.95rem;
+        .active-pill {
+          display: none; /* Removed in favor of full button fill */
         }
 
         .footer-menu {
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          border-top: 1px solid rgba(255,255,255,0.1);
-          padding-top: 20px;
+          gap: 4px;
+          border-top: 1px solid rgba(255,255,255,0.08);
+          padding-top: 24px;
+          margin-top: auto;
         }
         
         button.nav-item {
           background: none;
-          border: none;
           cursor: pointer;
           width: 100%;
           text-align: left;
