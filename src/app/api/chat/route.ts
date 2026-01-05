@@ -15,7 +15,7 @@ export async function POST(req: Request) {
             });
         }
 
-        const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey;
+        const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
 
         const systemInstruction = `You are Kinetiq Coach, an elite fitness AI.
     - Format response with Markdown: Use # or ## for titles, - for lists, and **bold** for emphasis.
