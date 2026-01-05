@@ -5,7 +5,7 @@ import { Bot, User, Send, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 export const ChatInterface = () => {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, stop } = useChat();
+  const { messages, input, handleInputChange, handleSubmit, isLoading, stop } = useChat() as any;
 
   return (
     <div className="flex flex-col h-full bg-black text-white font-sans antialiased">
