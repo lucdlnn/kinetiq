@@ -1,80 +1,95 @@
 .kinetiq-btn {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: none;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-size: 0.95rem;
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    font-family: var(--font-inter);
-    font-weight: 600;
-    transition: all 0.2s ease;
-    border-radius: 9999px;
-    /* Pills look premium */
+    border: none;
+    text-decoration: none;
+
+    /* Chunky Shape */
+    border-radius: var(--radius-md);
+    height: 48px;
+    padding: 0 24px;
 }
 
-.kinetiq-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+/* 3D ACTIVE STATE for all buttons */
+.kinetiq-btn:active {
+    transform: translateY(4px);
+    box-shadow: none !important;
 }
 
-/* Variants */
+/* --- PRIMARY --- */
+/* Duolingo Style: Volt Top, Darker Border Bottom */
 .kinetiq-btn--primary {
     background: var(--kinetiq-volt);
     color: var(--kinetiq-black);
+    border-bottom: 4px solid var(--kinetiq-volt-dark);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .kinetiq-btn--primary:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.1);
-    box-shadow: 0 4px 12px rgba(204, 255, 0, 0.3);
+    filter: brightness(1.05);
 }
 
-.kinetiq-btn--secondary {
-    background: var(--kinetiq-electric);
-    color: #ffffff;
-}
-
-.kinetiq-btn--secondary:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 4px 12px rgba(48, 98, 255, 0.3);
-}
-
+/* --- SECONDARY / OUTLINE --- */
 .kinetiq-btn--outline {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: var(--text-primary);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-bottom-width: 4px;
+    /* Chunky outline */
 }
 
 .kinetiq-btn--outline:hover {
-    border-color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.05);
 }
 
+/* --- GHOST --- */
 .kinetiq-btn--ghost {
     background: transparent;
     color: var(--text-secondary);
 }
 
 .kinetiq-btn--ghost:hover {
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
 }
 
-/* Sizes */
+/* --- SIZES --- */
 .kinetiq-btn--sm {
-    padding: 8px 16px;
-    font-size: 0.875rem;
-}
-
-.kinetiq-btn--md {
-    padding: 12px 24px;
-    font-size: 1rem;
+    height: 36px;
+    font-size: 0.85rem;
+    padding: 0 16px;
+    border-bottom-width: 3px;
 }
 
 .kinetiq-btn--lg {
-    padding: 16px 32px;
-    font-size: 1.125rem;
+    height: 56px;
+    font-size: 1.1rem;
+    padding: 0 32px;
+    border-bottom-width: 5px;
+}
+
+.kinetiq-btn--lg:active {
+    transform: translateY(5px);
 }
 
 .kinetiq-btn--full {
     width: 100%;
+}
+
+/* Disabled */
+.kinetiq-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    border-bottom-color: transparent;
 }

@@ -1,32 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+
 :root {
-  /* Brand Palette - Nike/Strava Premium Vibe */
-  --kinetiq-black: #0d0d0d;
-  --kinetiq-charcoal: #1c1c1e;
-  /* Card background */
-  --kinetiq-volt: #ccff00;
-  /* Primary Action */
-  --kinetiq-electric: #3062ff;
-  /* Secondary */
-  --kinetiq-error: #ff3b30;
-  --kinetiq-success: #34c759;
+  /* Brand Palette - VIBRANT & ACTIVE */
+  --kinetiq-bg: #121214;
+  --kinetiq-card: #202024;
+
+  /* The "JUICY" Colors (High saturation) */
+  --kinetiq-volt: #CCFF00;
+  /* Electric Lime */
+  --kinetiq-volt-dark: #A3CC00;
+  /* For 3D shade */
+
+  --kinetiq-orange: #FF4D00;
+  /* Strava-like Orange */
+  --kinetiq-blue: #00C2FF;
+  /* Electric Blue */
+  --kinetiq-pink: #FF0080;
+  /* POP Pink */
 
   /* Text Colors */
   --text-primary: #ffffff;
-  --text-secondary: #A0A0A5;
-  /* Lightened from #8F8F95 for better contrast */
-  --text-tertiary: #48484a;
+  --text-secondary: #A1A1AA;
+  --text-tertiary: #52525B;
 
-  /* Spacing & Layout */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
+  /* Spacing & Layout - CHUNKY & ROUNDED */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --radius-xl: 32px;
 
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
+  /* Animations */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 * {
@@ -35,88 +39,61 @@
   margin: 0;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
 body {
   color: var(--text-primary);
-  background: var(--kinetiq-black);
-  font-family: var(--font-inter), sans-serif;
+  background: var(--kinetiq-bg);
+  font-family: 'Outfit', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
-
-  /* Mobile Full Height Fix */
   min-height: 100vh;
-  min-height: 100dvh;
-
-  /* iOS Safe Areas */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-  -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
+/* GAMIFIED BUTTON UTILITIES */
+.btn-pop {
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-  transition: opacity 0.2s ease;
+.btn-pop:active {
+  transform: scale(0.95);
 }
 
-a:hover {
-  opacity: 0.8;
-}
-
-/* Utilities */
+/* VIBRANT PANELS */
 .glass-panel {
-  background: rgba(28, 28, 30, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--kinetiq-card);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .text-gradient {
-  background: linear-gradient(to right, var(--kinetiq-volt), #ffffff);
+  background: linear-gradient(135deg, var(--kinetiq-volt), var(--kinetiq-blue));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Custom Input Styling */
+/* Chunky Input */
 .input-field {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #2C2C30;
+  border: 2px solid transparent;
   color: white;
-  padding: 12px 16px;
-  border-radius: 12px;
-  outline: none;
-  font-family: var(--font-inter);
-  transition: all 0.2s ease;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
 .input-field:focus {
-  border-color: var(--kinetiq-volt);
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 0 4px rgba(204, 255, 0, 0.1);
+  background: #323236;
+  border-color: var(--kinetiq-blue);
+  outline: none;
 }
 
-/* Hide default date picker icon in dark mode and use custom if needed, or just style container */
-::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.5;
-  cursor: pointer;
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3F3F46;
+  border-radius: 10px;
 }
