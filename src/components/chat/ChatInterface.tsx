@@ -59,8 +59,8 @@ export const ChatInterface = () => {
               `}
             >
               {/* Content Parsing */}
-              {msg.content.split("\n").map((line: any, i: any) => {
-                if (!line.trim()) return <div key={i} className="h-3" />;
+              {(msg.content || '').split("\n").map((line: any, i: any) => {
+                if (!line?.trim()) return <div key={i} className="h-3" />;
 
                 // Simple formatting
                 const formattedLine = line
@@ -114,8 +114,8 @@ export const ChatInterface = () => {
           ) : (
             <Button
               type="submit"
-              disabled={!input.trim()}
-              className={`!w-8 !h-8 !p-0 !rounded-full flex items-center justify-center transition-all ${input.trim() ? "bg-[#3062FF] hover:bg-blue-600 scale-100" : "bg-gray-600 scale-90 opacity-50"
+              disabled={!input?.trim()}
+              className={`!w-8 !h-8 !p-0 !rounded-full flex items-center justify-center transition-all ${input?.trim() ? "bg-[#3062FF] hover:bg-blue-600 scale-100" : "bg-gray-600 scale-90 opacity-50"
                 }`}
             >
               <Send size={14} className="text-white ml-0.5" />
