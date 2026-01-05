@@ -13,7 +13,7 @@ export const ChatInterface = () => {
       {/* Scrollable Chat Area */}
       <div className="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin">
         <div className="max-w-3xl mx-auto space-y-8">
-          {messages.map(m => (
+          {messages.map((m: any) => (
             <div key={m.id} className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
 
               {/* Avatar Column */}
@@ -35,7 +35,7 @@ export const ChatInterface = () => {
                   {m.role === 'user' ? 'You' : 'Kinetiq'}
                 </p>
                 <div className="prose prose-invert max-w-none text-[15px] leading-7 text-gray-200">
-                  {m.content.split('\n').map((line, i) => (
+                  {m.content.split('\n').map((line: any, i: any) => (
                     <p key={i} className="mb-2 last:mb-0">
                       {line.replace(/\*\*/g, '')}
                       {/* Simple text render first to match clean style, can add Markdown component later if needed */}
