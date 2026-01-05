@@ -51,15 +51,28 @@
     background: rgba(255, 255, 255, 0.05);
 }
 
-/* --- GHOST --- */
+/* --- GHOST (Flat for Sidebar/Nav) --- */
 .kinetiq-btn--ghost {
     background: transparent;
     color: var(--text-secondary);
+    border: none;
+    /* No 3D border */
+    padding: 0 16px;
+    /* Reset padding if needed */
+    justify-content: flex-start;
+    /* Align left usually for sidebar */
+    height: auto;
+    min-height: 44px;
 }
 
 .kinetiq-btn--ghost:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     color: white;
+}
+
+.kinetiq-btn--ghost:active {
+    transform: none;
+    /* No bounce for navigation links */
 }
 
 /* --- SIZES --- */

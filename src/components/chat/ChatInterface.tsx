@@ -5,8 +5,9 @@ import { Send, Sparkles, User, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 interface Message {
+  id?: string;
   role: 'user' | 'assistant';
-  content: string;
+  content: string; // Unified: use content, not text
 }
 
 export const ChatInterface = () => {
@@ -97,47 +98,51 @@ export const ChatInterface = () => {
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 mt-1">
-                <Bot size={14} className="text-secondary" />
-              </div>
-            )}
+      {/* MESSAGES: Colorful Bubbles */}
+      <div className="chat-messages flex-1 overflow-y-auto p-5 scrollbar-thin space-y-4">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-enter`}>
+            <div className={`
+                max-w-[85%] rounded-[20px] px-5 py-3 shadow-md text-[15px] leading-relaxed
+                ${msg.role === 'user'
+                ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-sm'
+                : 'bg-[#27272A] text-gray-100 rounded-tl-sm border border-[#3F3F46]'}
+             `}>
+              {/* Explicitly render distinct blocks */}
+              {msg.text.split('\n').map((line, i) => {
+                if (!line.trim()) return <div key={i} className="h-2" />;
 
-            <div
-              className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${msg.role === 'user'
-                  ? 'bg-[#3062FF] text-white rounded-tr-none'
-                  : 'bg-[#1c1c1e] border border-white/5 rounded-tl-none'
-                }`}
-            >
-              <div className="text-sm">
-                {msg.role === 'user' ? msg.content : renderContent(msg.content)}
-              </div>
+                // Headings
+                if (line.startsWith('##')) return <h3 key={i} className="text-lg font-bold text-kinetiq-volt mt-2 mb-1">{line.replace(/#/g, '')}</h3>;
+                if (line.startsWith('**')) return <p key={i} className="font-bold mb-1" dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '$1') }} />;
+
+                // Lists
+                if (line.trim().startsWith('- ')) return (
+                  <div key={i} className="flex gap-2 mb-1 ml-1">
+                    <span className="text-kinetiq-volt">•</span>
+                    <span dangerouslySetInnerHTML={{
+                      __html: line.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-400 underline">$1</a>')
+                    }} />
+                  </div>
+                );
+
+                // Standard Paragraph with link support
+                return <p key={i} className="mb-2 last:mb-0" dangerouslySetInnerHTML={{
+                  __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="underline decoration-kinetiq-volt decoration-2 font-medium hover:text-kinetiq-volt transition-colors">$1</a>')
+                }} />;
+              })}
             </div>
-
-            {msg.role === 'user' && (
-              <div className="w-8 h-8 rounded-full bg-[#3062FF]/20 flex items-center justify-center flex-shrink-0 mt-1">
-                <User size={14} className="text-[#3062FF]" />
-              </div>
-            )}
           </div>
         ))}
 
         {isLoading && (
-          <div className="flex gap-3 justify-start">
-            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 mt-1">
-              <Bot size={14} className="text-secondary" />
-            </div>
-            <div className="bg-[#1c1c1e] border border-white/5 rounded-2xl rounded-tl-none p-4 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
-              <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
-              <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full animate-bounce" />
+          <div className="flex justify-start">
+            <div className="bg-[#27272A] px-4 py-3 rounded-[20px] rounded-tl-sm border border-[#3F3F46] flex gap-1.5 items-center">
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100" />
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200" />
             </div>
           </div>
         )}
