@@ -109,7 +109,7 @@ export const ChatInterface = () => {
                 : 'bg-[#27272A] text-gray-100 rounded-tl-sm border border-[#3F3F46]'}
              `}>
               {/* Explicitly render distinct blocks */}
-              {msg.text.split('\n').map((line, i) => {
+              {msg.content.split('\n').map((line, i) => {
                 if (!line.trim()) return <div key={i} className="h-2" />;
 
                 // Headings
