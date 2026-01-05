@@ -8,8 +8,19 @@ interface WorkoutDetailModalProps {
     onClose: () => void;
 }
 
+import { usePlan } from "@/lib/PlanContext";
+
 export const WorkoutDetailModal = ({ workout, onClose }: WorkoutDetailModalProps) => {
+    const { deleteActivity } = usePlan();
+
     if (!workout) return null;
+
+    const handleDelete = () => {
+        if (confirm('Are you sure you want to delete this workout?')) {
+            deleteActivity(workout.id);
+            onClose();
+        }
+    };
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -53,7 +64,8 @@ export const WorkoutDetailModal = ({ workout, onClose }: WorkoutDetailModalProps
                     </div>
                 </div>
 
-                <div className="modal-footer">
+                <div className="modal-footer flex gap-3">
+                    <Button variant="outline" onClick={handleDelete} className="text-red-500 hover:text-red-400">Delete</Button>
                     <Button variant="primary" fullWidth size="lg">Start Session Now</Button>
                 </div>
             </div>

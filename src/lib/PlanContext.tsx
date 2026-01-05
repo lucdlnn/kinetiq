@@ -41,6 +41,7 @@ interface PlanContextType {
     addMeal: (meal: Omit<Meal, 'id'>) => void;
     toggleActivityCompletion: (id: string) => void;
     deleteActivity: (id: string) => void;
+    deleteMeal: (id: string) => void;
     getActivitiesByDate: (date: Date) => Activity[];
 }
 
@@ -100,6 +101,10 @@ export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
         setActivities(prev => prev.filter(a => a.id !== id));
     };
 
+    const deleteMeal = (id: string) => {
+        setMeals(prev => prev.filter(m => m.id !== id));
+    };
+
     const getActivitiesByDate = (date: Date) => {
         const dateStr = date.toISOString().split('T')[0];
         return activities.filter(a => a.date.startsWith(dateStr));
@@ -107,7 +112,7 @@ export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <PlanContext.Provider value={{
-            activities, meals, macroTargets, setMacroTargets, addActivity, addMeal, toggleActivityCompletion, deleteActivity, getActivitiesByDate
+            activities, meals, macroTargets, setMacroTargets, addActivity, addMeal, toggleActivityCompletion, deleteActivity, deleteMeal, getActivitiesByDate
         }}>
             {children}
         </PlanContext.Provider>
