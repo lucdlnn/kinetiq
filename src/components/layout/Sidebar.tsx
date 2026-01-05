@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, Activity, Dumbbell, Utensils, MessageSquare, Settings, LogOut, Calendar } from "lucide-react";
+import { Home, Dumbbell, Utensils, MessageSquare, Settings, LogOut, Calendar } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: Home },
@@ -16,9 +16,9 @@ export const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="sidebar glass-panel">
+    <aside className="sidebar">
       <div className="logo-area">
-        <span className="logo-text text-gradient">Kinetiq</span>
+        <span className="logo-text">Kinetiq</span>
       </div>
 
       <nav className="nav-menu">
@@ -27,9 +27,8 @@ export const Sidebar = () => {
           const isActive = pathname === item.href;
           return (
             <Link key={item.href} href={item.href} className={`nav-item ${isActive ? "active" : ""}`}>
-              <Icon size={20} />
+              <Icon size={20} className={isActive ? "text-black" : "text-current"} />
               <span className="nav-label">{item.label}</span>
-              {isActive && <motion.div layoutId="active-pill" className="active-pill" />}
             </Link>
           );
         })}
@@ -58,7 +57,7 @@ export const Sidebar = () => {
           display: flex;
           flex-direction: column;
           padding: 32px 24px;
-          background: rgba(18, 18, 20, 0.95); /* Deep dark background */
+          background: rgba(18, 18, 20, 0.98);
           border-right: 1px solid rgba(255,255,255,0.08);
           z-index: 50;
           backdrop-filter: blur(20px);
@@ -76,8 +75,8 @@ export const Sidebar = () => {
         .logo-text {
           font-size: 1.75rem;
           font-weight: 800;
-          letter-spacing: -0.03em;
-          background: linear-gradient(to right, #ffffff, #a1a1aa); /* Chrome/Silver gradient */
+          letter-spacing: -0.02em;
+          background: linear-gradient(to right, #ffffff, #a1a1aa);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
@@ -85,7 +84,7 @@ export const Sidebar = () => {
         .nav-menu {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 12px;
           flex: 1;
         }
 
@@ -95,29 +94,30 @@ export const Sidebar = () => {
           gap: 16px;
           padding: 14px 16px;
           border-radius: 16px;
-          color: #A1A1AA; /* Light gray for inactive */
+          color: #A1A1AA;
           font-size: 0.95rem;
           font-weight: 600;
-          transition: all 0.2s ease-out;
           text-decoration: none;
+          transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
           border: 1px solid transparent;
         }
 
         .nav-item:hover {
           color: #ffffff;
-          background: rgba(255,255,255,0.08); /* Subtle highlight */
+          background: rgba(255,255,255,0.08);
           transform: translateX(4px);
         }
 
         .nav-item.active {
-          color: #121214; /* Black text on Volt */
+          color: #121214 !important;
           background: var(--kinetiq-volt);
-          box-shadow: 0 4px 20px rgba(204, 255, 0, 0.2); /* Glow */
+          box-shadow: 0 8px 24px -6px rgba(204, 255, 0, 0.4);
           border-color: var(--kinetiq-volt);
+          transform: scale(1.02);
         }
 
-        .active-pill {
-          display: none; /* Removed in favor of full button fill */
+        .nav-label {
+          font-weight: inherit;
         }
 
         .footer-menu {
@@ -140,5 +140,3 @@ export const Sidebar = () => {
     </aside>
   );
 };
-
-import { motion } from "framer-motion";
