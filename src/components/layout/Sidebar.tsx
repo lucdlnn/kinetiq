@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Home, Dumbbell, Utensils, MessageSquare, Settings, LogOut, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: Home },
@@ -21,30 +22,36 @@ export const Sidebar = () => {
         <span className="logo-text">Kinetiq</span>
       </div>
 
-      <nav className="nav-menu">
+      <nav className="nav-menu space-y-3">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
           return (
-            <Link key={item.href} href={item.href} className={`nav-item ${isActive ? "active" : ""}`}>
-              <Icon size={20} className={isActive ? "text-black" : "text-current"} />
-              <span className="nav-label">{item.label}</span>
+            <Link key={item.href} href={item.href} className="w-full block">
+              <Button
+                variant={isActive ? "primary" : "ghost"}
+                fullWidth
+                className={`!justify-start gap-3 !px-4 ${!isActive ? 'text-secondary hover:text-white' : ''}`}
+              >
+                <Icon size={20} className={isActive ? "text-black" : "text-current"} />
+                <span className="font-bold">{item.label}</span>
+              </Button>
             </Link>
           );
         })}
       </nav>
 
-      <div className="footer-menu">
-        <Link href="/dashboard/settings">
-          <button className="nav-item">
+      <div className="footer-menu space-y-3 mt-auto pt-6 border-t border-white/10">
+        <Link href="/dashboard/settings" className="w-full block">
+          <Button variant="ghost" fullWidth className="!justify-start gap-3 !px-4 text-secondary hover:text-white">
             <Settings size={20} />
-            <span className="nav-label">Settings</span>
-          </button>
+            <span className="font-bold">Settings</span>
+          </Button>
         </Link>
-        <button className="nav-item">
+        <Button variant="ghost" fullWidth className="!justify-start gap-3 !px-4 text-secondary hover:text-red-400">
           <LogOut size={20} />
-          <span className="nav-label">Logout</span>
-        </button>
+          <span className="font-bold">Logout</span>
+        </Button>
       </div>
 
       <style jsx>{`
@@ -57,10 +64,9 @@ export const Sidebar = () => {
           display: flex;
           flex-direction: column;
           padding: 32px 24px;
-          background: rgba(18, 18, 20, 0.98);
-          border-right: 1px solid rgba(255,255,255,0.08);
+          background: #121214; /* Solid dark background */
+          border-right: 2px solid #27272A;
           z-index: 50;
-          backdrop-filter: blur(20px);
         }
 
         @media (max-width: 768px) {
@@ -68,73 +74,22 @@ export const Sidebar = () => {
         }
 
         .logo-area {
-          margin-bottom: 48px;
-          padding-left: 12px;
+          margin-bottom: 40px;
+          padding-left: 8px;
         }
 
         .logo-text {
-          font-size: 1.75rem;
-          font-weight: 800;
-          letter-spacing: -0.02em;
-          background: linear-gradient(to right, #ffffff, #a1a1aa);
+          font-size: 2rem;
+          font-weight: 900;
+          letter-spacing: -0.04em;
+          background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+          font-style: italic;
         }
 
         .nav-menu {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
           flex: 1;
-        }
-
-        .nav-item {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          padding: 14px 16px;
-          border-radius: 16px;
-          color: #A1A1AA;
-          font-size: 0.95rem;
-          font-weight: 600;
-          text-decoration: none;
-          transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-          border: 1px solid transparent;
-        }
-
-        .nav-item:hover {
-          color: #ffffff;
-          background: rgba(255,255,255,0.08);
-          transform: translateX(4px);
-        }
-
-        .nav-item.active {
-          color: #121214 !important;
-          background: var(--kinetiq-volt);
-          box-shadow: 0 8px 24px -6px rgba(204, 255, 0, 0.4);
-          border-color: var(--kinetiq-volt);
-          transform: scale(1.02);
-        }
-
-        .nav-label {
-          font-weight: inherit;
-        }
-
-        .footer-menu {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          border-top: 1px solid rgba(255,255,255,0.08);
-          padding-top: 24px;
-          margin-top: auto;
-        }
-        
-        button.nav-item {
-          background: none;
-          cursor: pointer;
-          width: 100%;
-          text-align: left;
-          font-family: inherit;
         }
       `}</style>
     </aside>
