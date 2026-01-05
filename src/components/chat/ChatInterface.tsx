@@ -1,24 +1,19 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Send, User, Bot } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { useState, useRef, useEffect } from 'react';
+import { Send, Sparkles, User, Bot } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  text: string;
-};
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 export const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      text: "Hello! I'm your Kinetiq Coach. I've analyzed your onboarding data. Your 5K goal looks ambitious but achievable. How are you feeling about your first scheduled run?"
-    }
+    { role: 'assistant', content: "Hello! I'm your Kinetiq Coach. 🤖\n\nI can help you with:\n- **Workout Plans** tailored to your goals.\n- **Meal Suggestions** with macros (try asking for a recipe!).\n- **Form Tips** & advice.\n\nHow are you feeling today?" }
   ]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -26,218 +21,153 @@ export const ChatInterface = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(scrollToBottom, [messages]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
 
-  const handleSend = async () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const newMsg: Message = { id: Date.now().toString(), role: "user", text: input };
-    setMessages(prev => [...prev, newMsg]);
-    setInput("");
+    const userMsg = { role: 'user' as const, content: input };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input })
       });
 
-      const data = await response.json();
-
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        text: data.reply
-      }]);
-
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (error) {
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        text: "Connection error. Please check your network."
-      }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "⚠️ Connection error. Please try again." }]);
     } finally {
-      setIsLoading(false); // Set loading false after fetch completes or errors
+      setIsLoading(false);
     }
   };
 
-  const renderMessageContent = (text: string) => {
-    // Simple Markdown Parser
-    const lines = text.split('\n');
-    return lines.map((line, idx) => {
-      // Bold: **text**
-      const boldRegex = /\*\*(.*?)\*\*/g;
-      const hasBold = boldRegex.test(line);
+  // Helper to render Markdown-like content safely
+  const renderContent = (text: string) => {
+    // Simple parser for basic formatting to avoid heavy libraries for now
+    // 1. Headers
+    let processed = text.replace(/### (.*$)/gim, '<h3 class="font-bold text-lg mt-3 mb-1 text-white">$1</h3>');
+    processed = processed.replace(/## (.*$)/gim, '<h2 class="font-bold text-xl mt-4 mb-2 text-kinetiq-volt">$1</h2>');
 
-      // Links: [text](url)
-      const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g;
-      const hasLink = linkRegex.test(line);
+    // 2. Bold
+    processed = processed.replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white font-semibold">$1</strong>');
 
-      // Headings
-      if (line.startsWith('# ')) return <h3 key={idx} className="text-lg font-bold mt-4 mb-2 text-white border-b border-white/10 pb-1">{line.substring(2)}</h3>;
-      if (line.startsWith('## ')) return <h3 key={idx} className="text-base font-bold mt-4 mb-2 text-kinetiq-volt">{line.substring(3)}</h3>;
-      if (line.startsWith('### ')) return <h3 key={idx} className="text-sm font-bold mt-3 mb-1 text-white">{line.substring(4)}</h3>;
+    // 3. Lists ( - item)
+    processed = processed.replace(/^- (.*$)/gim, '<li class="ml-4 list-disc marker:text-kinetiq-volt text-secondary">$1</li>');
 
-      // List items
-      if (line.trim().startsWith('- ')) {
-        const content = line.trim().substring(2);
-        let processedContent = content;
-        if (hasBold) processedContent = processedContent.replace(boldRegex, '<strong class="text-white font-semibold">$1</strong>');
-        if (hasLink) processedContent = processedContent.replace(linkRegex, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">$1</a>');
-        return (
-          <li key={idx} className="ml-4 list-disc mb-1 text-gray-300">
-            <span dangerouslySetInnerHTML={{ __html: processedContent }} />
-          </li>
-        );
-      }
+    // 4. Links [Title](url) -> Button
+    processed = processed.replace(
+      /\[(.*?)\]\((.*?)\)/gim,
+      '<a href="$2" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-kinetiq-volt mt-1 transition-colors">🔗 $1</a>'
+    );
 
-      // Paragraphs
-      let processedLine = line;
-      if (hasBold) processedLine = processedLine.replace(boldRegex, '<strong class="text-white font-semibold">$1</strong>');
-      if (hasLink) processedLine = processedLine.replace(linkRegex, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">$1</a>');
-
-      return (
-        <p key={idx} className="mb-3 last:mb-0 leading-relaxed text-gray-300">
-          <span dangerouslySetInnerHTML={{ __html: processedLine }} />
-        </p>
-      );
+    // 5. Wrap in paragraphs (simple split by newline)
+    return processed.split('\n').map((line, i) => {
+      if (line.match(/^<h/)) return <div key={i} dangerouslySetInnerHTML={{ __html: line }} />;
+      if (line.match(/^<li/)) return <ul key={i} dangerouslySetInnerHTML={{ __html: line }} className="my-1" />;
+      if (line.trim() === '') return <div key={i} className="h-2" />;
+      return <p key={i} dangerouslySetInnerHTML={{ __html: line }} className="leading-relaxed text-secondary/90 mb-1" />;
     });
   };
 
   return (
-    <div className="chat-interface flex flex-col h-[600px] glass-panel relative overflow-hidden">
-      {/* Background Decoration */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
+    <div className="flex flex-col h-[600px] w-full max-w-4xl mx-auto bg-[#0a0a0a] rounded-2xl border border-white/5 shadow-2xl overflow-hidden relative glass-panel">
+      {/* Ambient Background */}
+      <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_var(--kinetiq-volt)_0%,_transparent_5%)] opacity-5 pointer-events-none" />
 
-      <div className="chat-header p-4 border-b border-white/10">
-        <h2 className="text-lg font-bold flex items-center gap-2">
-          🤖 Kinetiq Coach <span className="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">Online</span>
-        </h2>
+      {/* Header */}
+      <div className="p-4 border-b border-white/5 bg-white/5 backdrop-blur-md flex items-center justify-between z-10">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-kinetiq-volt to-emerald-500 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(204,255,0,0.3)]">
+            <Sparkles size={20} className="text-black" />
+          </div>
+          <div>
+            <h3 className="font-bold text-white">Coach Kinetiq</h3>
+            <p className="text-xs text-green-400 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" /> Online
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="chat-messages flex-1 overflow-y-auto p-6 scrollbar-thin">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`message mb-6 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`message-bubble max-w-[85%] rounded-2xl p-4 ${msg.role === 'user'
-                ? 'bg-blue-600/20 border border-blue-500/30 text-white rounded-tr-none'
-                : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-none shadow-lg backdrop-blur-sm'
-              }`}>
-              {renderMessageContent(msg.text)}
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        {messages.map((msg, idx) => (
+          <div
+            key={idx}
+            className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            {msg.role === 'assistant' && (
+              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 mt-1">
+                <Bot size={14} className="text-secondary" />
+              </div>
+            )}
+
+            <div
+              className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${msg.role === 'user'
+                  ? 'bg-[#3062FF] text-white rounded-tr-none'
+                  : 'bg-[#1c1c1e] border border-white/5 rounded-tl-none'
+                }`}
+            >
+              <div className="text-sm">
+                {msg.role === 'user' ? msg.content : renderContent(msg.content)}
+              </div>
             </div>
+
+            {msg.role === 'user' && (
+              <div className="w-8 h-8 rounded-full bg-[#3062FF]/20 flex items-center justify-center flex-shrink-0 mt-1">
+                <User size={14} className="text-[#3062FF]" />
+              </div>
+            )}
           </div>
         ))}
+
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-[#1c1c1e] p-3 rounded-2xl rounded-bl-none border border-white/10 flex gap-2">
-              <span className="dot-pulse">.</span><span className="dot-pulse delay-100">.</span><span className="dot-pulse delay-200">.</span>
+          <div className="flex gap-3 justify-start">
+            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 mt-1">
+              <Bot size={14} className="text-secondary" />
+            </div>
+            <div className="bg-[#1c1c1e] border border-white/5 rounded-2xl rounded-tl-none p-4 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
+              <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
+              <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full animate-bounce" />
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="input-area">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Ask your coach anything..."
-          className="chat-input"
-        />
-        <Button variant="primary" onClick={handleSend} className="send-btn">
-          <Send size={18} />
-        </Button>
+      {/* Input Area */}
+      <div className="p-4 bg-black/40 backdrop-blur-md border-t border-white/5">
+        <div className="flex gap-2 relative">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Ask for a workout, meal plan, or advice..."
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-kinetiq-volt/50 focus:bg-white/10 transition-all placeholder:text-secondary/50"
+          />
+          <Button
+            onClick={sendMessage}
+            variant="primary"
+            disabled={isLoading || !input.trim()}
+            className="h-[46px] w-[46px] !p-0 flex items-center justify-center rounded-xl flex-shrink-0"
+          >
+            <Send size={18} />
+          </Button>
+        </div>
+        <p className="text-[10px] text-center text-secondary/30 mt-2">
+          AI can make mistakes. Check important info.
+        </p>
       </div>
-
-      <style jsx>{`
-        .chat-container {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-          border-radius: var(--radius-lg);
-          overflow: hidden;
-        }
-
-        .messages-area {
-          flex: 1;
-          padding: 24px;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-
-        .message-row {
-          display: flex;
-          gap: 12px;
-          max-width: 80%;
-        }
-
-        .user-row {
-          align-self: flex-end;
-          flex-direction: row-reverse;
-        }
-
-        .bot-row {
-          align-self: flex-start;
-        }
-
-        .avatar {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .avatar.user { background: rgba(255,255,255,0.1); color: white; }
-        .avatar.assistant { background: var(--kinetiq-electric); color: white; }
-
-        .bubble {
-          padding: 12px 16px;
-          border-radius: 18px;
-          font-size: 0.95rem;
-          line-height: 1.5;
-        }
-
-        .bubble.user {
-          background: var(--kinetiq-volt);
-          color: var(--kinetiq-black);
-          border-bottom-right-radius: 4px;
-        }
-
-        .bubble.assistant {
-          background: rgba(255,255,255,0.05);
-          color: white;
-          border-bottom-left-radius: 4px;
-        }
-
-        .input-area {
-          padding: 16px;
-          background: rgba(0,0,0,0.2);
-          display: flex;
-          gap: 12px;
-          border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .chat-input {
-          flex: 1;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 20px;
-          padding: 0 16px;
-          color: white;
-          outline: none;
-        }
-
-        .chat-input:focus {
-          border-color: var(--kinetiq-volt);
-        }
-      `}</style>
     </div>
   );
 };
